@@ -71,16 +71,20 @@ module.exports = function style9Plugin(opts = {}) {
       if (id === VIRTUAL_CSS_NAME) return genCSS(cssModules);
       return null;
     },
-    transform(code, id) {
-      if (!filter(id)) {
-        return;
-      }
-      return transformStyle9(code, id, {
-        parserOptions,
-        restOptions,
-        cssModules,
-        server
-      });
+    transform: {
+      order: 'pre',
+      async handler(code, id) {
+        if (!filter(id)) {
+          return;
+        }
+        const o = await transformStyle9(code, id, {
+          parserOptions,
+          restOptions,
+          cssModules,
+          server,
+        });
+        return o;
+      },
     },
     renderChunk(_, chunk) {
       const ids = Object.keys(chunk.modules);
